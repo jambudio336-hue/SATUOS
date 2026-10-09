@@ -26,7 +26,7 @@ npx expo start
 ```
 
 ## Build APK
-Workflow `.github/workflows/android-apk.yml` berjalan pada pembaruan branch `main`, bisa dijalankan manual, dan menjalankan Expo prebuild dan Gradle `assembleDebug`, lalu mengunggah APK debug sebagai artefak jika berhasil. Jalankan melalui tab **Actions** atau push tag versi. APK debug untuk pengujian bukan APK release bertanda tangan untuk distribusi publik.
+Workflow `.github/workflows/android-apk.yml` berjalan pada pembaruan branch `main` dan tag versi `v*`, serta bisa dijalankan manual. Workflow menjalankan pemeriksaan TypeScript, tes otomatis, pemeriksaan dependensi Expo, dan build APK debug. APK release bertanda tangan dibuat hanya jika empat GitHub Actions Secrets signing telah dikonfigurasi. Panduan lengkap: [`docs/RELEASE-APK.md`](docs/RELEASE-APK.md). APK debug untuk pengujian bukan APK release bertanda tangan untuk distribusi publik.
 
 ## Batasan yang diketahui
 - Sinkronisasi antarperangkat, akun cloud, OAuth, AI generatif, dan integrasi penerbitan media sosial otomatis belum aktif.
