@@ -15,4 +15,5 @@ jobs:
           node-version: 20
       - run: npm install
       - run: npx tsc --noEmit
+      - run: npm test -- --passWithNoTests
       - run: npx expo install --check
