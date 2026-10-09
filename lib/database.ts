@@ -1,34 +1,50 @@
 import * as SQLite from 'expo-sqlite';
 
 let promise: Promise<SQLite.SQLiteDatabase> | undefined;
+let initialization: Promise<SQLite.SQLiteDatabase> | undefined;
+
 export async function db() {
-  if (!promise) promise = SQLite.openDatabaseAsync('satuos.db');
+  if (!promise) {
+    promise = SQLite.openDatabaseAsync('satuos.db').catch((error) => {
+      promise = undefined;
+      throw error;
+    });
+  }
   const d = await promise;
-  await d.execAsync(`
-    PRAGMA journal_mode=WAL;
-    CREATE TABLE IF NOT EXISTS migrations(version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL);
-    CREATE TABLE IF NOT EXISTS transactions(id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL CHECK(kind IN ('pemasukan','pengeluaran')), title TEXT NOT NULL, amount REAL NOT NULL CHECK(amount>=0), category TEXT NOT NULL DEFAULT 'Umum', wallet_id INTEGER, created_at TEXT NOT NULL DEFAULT (datetime('now')));
-    CREATE TABLE IF NOT EXISTS products(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,price REAL NOT NULL DEFAULT 0,cost REAL NOT NULL DEFAULT 0,stock INTEGER NOT NULL DEFAULT 0,updated_at TEXT NOT NULL DEFAULT (datetime('now')));
-    CREATE TABLE IF NOT EXISTS tasks(id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,done INTEGER NOT NULL DEFAULT 0,created_at TEXT NOT NULL DEFAULT (datetime('now')));
-    CREATE TABLE IF NOT EXISTS assets(id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,value REAL NOT NULL DEFAULT 0,kind TEXT NOT NULL DEFAULT 'aset');
-    CREATE TABLE IF NOT EXISTS drafts(id INTEGER PRIMARY KEY AUTOINCREMENT,platform TEXT NOT NULL,caption TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'Draf',created_at TEXT NOT NULL DEFAULT (datetime('now')));
-    CREATE TABLE IF NOT EXISTS trust_checks(id INTEGER PRIMARY KEY AUTOINCREMENT,target TEXT NOT NULL,verdict TEXT NOT NULL,reasons TEXT NOT NULL,created_at TEXT NOT NULL DEFAULT (datetime('now')));
-    CREATE TABLE IF NOT EXISTS wallets(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL UNIQUE,opening_balance REAL NOT NULL DEFAULT 0,created_at TEXT NOT NULL DEFAULT (datetime('now')));
-    CREATE TABLE IF NOT EXISTS budgets(id INTEGER PRIMARY KEY AUTOINCREMENT,category TEXT NOT NULL,amount REAL NOT NULL CHECK(amount>=0),month TEXT NOT NULL);
-    CREATE TABLE IF NOT EXISTS debts(id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,amount REAL NOT NULL CHECK(amount>=0),kind TEXT NOT NULL CHECK(kind IN ('utang','piutang')),due_date TEXT,paid INTEGER NOT NULL DEFAULT 0);
-    CREATE TABLE IF NOT EXISTS contacts(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,kind TEXT NOT NULL CHECK(kind IN ('pelanggan','pemasok')),phone TEXT NOT NULL DEFAULT '',notes TEXT NOT NULL DEFAULT '');
-    CREATE TABLE IF NOT EXISTS reminders(id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,due_at TEXT NOT NULL,done INTEGER NOT NULL DEFAULT 0);
-    CREATE TABLE IF NOT EXISTS notes(id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,body TEXT NOT NULL DEFAULT '',kind TEXT NOT NULL DEFAULT 'keluarga',created_at TEXT NOT NULL DEFAULT (datetime('now')));
-    CREATE TABLE IF NOT EXISTS activity_log(id INTEGER PRIMARY KEY AUTOINCREMENT,action TEXT NOT NULL,detail TEXT NOT NULL,created_at TEXT NOT NULL DEFAULT (datetime('now')));
-    CREATE TABLE IF NOT EXISTS purchases(id INTEGER PRIMARY KEY AUTOINCREMENT,product_id INTEGER NOT NULL,quantity INTEGER NOT NULL CHECK(quantity>0),unit_cost REAL NOT NULL CHECK(unit_cost>=0),created_at TEXT NOT NULL DEFAULT (datetime('now')));
-    CREATE TABLE IF NOT EXISTS sales(id INTEGER PRIMARY KEY AUTOINCREMENT,product_id INTEGER NOT NULL,product_name TEXT NOT NULL,quantity INTEGER NOT NULL CHECK(quantity>0),unit_price REAL NOT NULL CHECK(unit_price>=0),unit_cost REAL NOT NULL CHECK(unit_cost>=0),created_at TEXT NOT NULL DEFAULT (datetime('now')));
-    INSERT OR IGNORE INTO migrations(version,applied_at) VALUES(1,datetime('now'));
-  `);
-  // Safe additive migration for databases created by the first app version.
-  const cols = await d.getAllAsync<{name:string}>('PRAGMA table_info(transactions)');
-  if (!cols.some(c => c.name === 'wallet_id')) await d.execAsync('ALTER TABLE transactions ADD COLUMN wallet_id INTEGER');
-  await d.execAsync("INSERT OR IGNORE INTO migrations(version,applied_at) VALUES(2,datetime('now'))");
-  return d;
+  if (!initialization) {
+    initialization = (async () => {
+    await d.execAsync(`
+      PRAGMA journal_mode=WAL;
+      CREATE TABLE IF NOT EXISTS migrations(version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS transactions(id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL CHECK(kind IN ('pemasukan','pengeluaran')), title TEXT NOT NULL, amount REAL NOT NULL CHECK(amount>=0), category TEXT NOT NULL DEFAULT 'Umum', wallet_id INTEGER, created_at TEXT NOT NULL DEFAULT (datetime('now')));
+      CREATE TABLE IF NOT EXISTS products(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,price REAL NOT NULL DEFAULT 0,cost REAL NOT NULL DEFAULT 0,stock INTEGER NOT NULL DEFAULT 0,updated_at TEXT NOT NULL DEFAULT (datetime('now')));
+      CREATE TABLE IF NOT EXISTS tasks(id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,done INTEGER NOT NULL DEFAULT 0,created_at TEXT NOT NULL DEFAULT (datetime('now')));
+      CREATE TABLE IF NOT EXISTS assets(id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,value REAL NOT NULL DEFAULT 0,kind TEXT NOT NULL DEFAULT 'aset');
+      CREATE TABLE IF NOT EXISTS drafts(id INTEGER PRIMARY KEY AUTOINCREMENT,platform TEXT NOT NULL,caption TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'Draf',created_at TEXT NOT NULL DEFAULT (datetime('now')));
+      CREATE TABLE IF NOT EXISTS trust_checks(id INTEGER PRIMARY KEY AUTOINCREMENT,target TEXT NOT NULL,verdict TEXT NOT NULL,reasons TEXT NOT NULL,created_at TEXT NOT NULL DEFAULT (datetime('now')));
+      CREATE TABLE IF NOT EXISTS wallets(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL UNIQUE,opening_balance REAL NOT NULL DEFAULT 0,created_at TEXT NOT NULL DEFAULT (datetime('now')));
+      CREATE TABLE IF NOT EXISTS budgets(id INTEGER PRIMARY KEY AUTOINCREMENT,category TEXT NOT NULL,amount REAL NOT NULL CHECK(amount>=0),month TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS debts(id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,amount REAL NOT NULL CHECK(amount>=0),kind TEXT NOT NULL CHECK(kind IN ('utang','piutang')),due_date TEXT,paid INTEGER NOT NULL DEFAULT 0);
+      CREATE TABLE IF NOT EXISTS contacts(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,kind TEXT NOT NULL CHECK(kind IN ('pelanggan','pemasok')),phone TEXT NOT NULL DEFAULT '',notes TEXT NOT NULL DEFAULT '');
+      CREATE TABLE IF NOT EXISTS reminders(id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,due_at TEXT NOT NULL,done INTEGER NOT NULL DEFAULT 0);
+      CREATE TABLE IF NOT EXISTS notes(id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,body TEXT NOT NULL DEFAULT '',kind TEXT NOT NULL DEFAULT 'keluarga',created_at TEXT NOT NULL DEFAULT (datetime('now')));
+      CREATE TABLE IF NOT EXISTS activity_log(id INTEGER PRIMARY KEY AUTOINCREMENT,action TEXT NOT NULL,detail TEXT NOT NULL,created_at TEXT NOT NULL DEFAULT (datetime('now')));
+      CREATE TABLE IF NOT EXISTS purchases(id INTEGER PRIMARY KEY AUTOINCREMENT,product_id INTEGER NOT NULL,quantity INTEGER NOT NULL CHECK(quantity>0),unit_cost REAL NOT NULL CHECK(unit_cost>=0),created_at TEXT NOT NULL DEFAULT (datetime('now')));
+      CREATE TABLE IF NOT EXISTS sales(id INTEGER PRIMARY KEY AUTOINCREMENT,product_id INTEGER NOT NULL,product_name TEXT NOT NULL,quantity INTEGER NOT NULL CHECK(quantity>0),unit_price REAL NOT NULL CHECK(unit_price>=0),unit_cost REAL NOT NULL CHECK(unit_cost>=0),created_at TEXT NOT NULL DEFAULT (datetime('now')));
+      INSERT OR IGNORE INTO migrations(version,applied_at) VALUES(1,datetime('now'));
+    `);
+    // Safe additive migration for databases created by the first app version.
+    const cols = await d.getAllAsync<{name:string}>('PRAGMA table_info(transactions)');
+    if (!cols.some(c => c.name === 'wallet_id')) await d.execAsync('ALTER TABLE transactions ADD COLUMN wallet_id INTEGER');
+    await d.execAsync("INSERT OR IGNORE INTO migrations(version,applied_at) VALUES(2,datetime('now'))");
+  
+      return d;
+    })().catch((error) => {
+      initialization = undefined;
+      throw error;
+    });
+  }
+  return initialization;
 }
 export type Transaction={id:number;kind:'pemasukan'|'pengeluaran';title:string;amount:number;category:string;wallet_id:number|null;created_at:string};
 export type Product={id:number;name:string;price:number;cost:number;stock:number;updated_at:string};
