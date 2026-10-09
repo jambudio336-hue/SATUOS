@@ -87,7 +87,19 @@ export async function addBudget(category:string,amount:number,month:string){if(!
 export async function listBudgets(month:string):Promise<Budget[]>{return(await db()).getAllAsync<Budget>("SELECT b.*,COALESCE((SELECT SUM(t.amount) FROM transactions t WHERE t.kind='pengeluaran' AND t.category=b.category AND substr(t.created_at,1,7)=b.month),0) spent FROM budgets b WHERE b.month=? ORDER BY b.category",month)}
 export async function addDebt(title:string,amount:number,kind:'utang'|'piutang',dueDate=''){if(!title.trim()||!Number.isFinite(amount)||amount<0)throw Error('Data utang/piutang tidak valid.');await(await db()).runAsync('INSERT INTO debts(title,amount,kind,due_date) VALUES(?,?,?,?)',title.trim(),amount,kind,dueDate||null)}
 export async function listDebts():Promise<Debt[]>{return(await db()).getAllAsync<Debt>('SELECT * FROM debts ORDER BY paid,due_date')}
-export async function settleDebt(id:number){await(await db()).runAsync('UPDATE debts SET paid=1 WHERE id=?',id)}
+export async function settleDebt(id:number){
+  const d=await db();
+  await d.withTransactionAsync(async()=>{
+    const debt=await d.getFirstAsync<Debt>('SELECT * FROM debts WHERE id=?',id);
+    if(!debt)throw Error('Catatan utang/piutang tidak ditemukan.');
+    if(debt.paid)throw Error('Catatan ini sudah ditandai lunas.');
+    await d.runAsync('UPDATE debts SET paid=1 WHERE id=?',id);
+    const kind=debt.kind==='utang'?'pengeluaran':'pemasukan';
+    const category=debt.kind==='utang'?'Pelunasan utang':'Penerimaan piutang';
+    await d.runAsync('INSERT INTO transactions(kind,title,amount,category) VALUES(?,?,?,?)',kind,(debt.kind==='utang'?'Pelunasan utang: ':'Penerimaan piutang: ')+debt.title,debt.amount,category);
+    await d.runAsync('INSERT INTO activity_log(action,detail) VALUES(?,?)','Catatan utang/piutang diselesaikan',debt.kind+': '+debt.title);
+  });
+}
 export async function addContact(name:string,kind:'pelanggan'|'pemasok',phone='',notes=''){if(!name.trim())throw Error('Nama kontak wajib diisi.');await(await db()).runAsync('INSERT INTO contacts(name,kind,phone,notes) VALUES(?,?,?,?)',name.trim(),kind,phone.trim(),notes.trim())}
 export async function listContacts(kind:'pelanggan'|'pemasok'):Promise<Contact[]>{return(await db()).getAllAsync<Contact>('SELECT * FROM contacts WHERE kind=? ORDER BY name COLLATE NOCASE',kind)}
 export async function addReminder(title:string,dueAt:string){if(!title.trim()||!dueAt.trim())throw Error('Judul dan tanggal pengingat wajib diisi.');await(await db()).runAsync('INSERT INTO reminders(title,due_at) VALUES(?,?)',title.trim(),dueAt.trim())}
