@@ -11,6 +11,7 @@ SATUOS adalah aplikasi Android local-first berbasis Expo, React Native, TypeScri
 - **SATU AI:** asisten lokal berbasis aturan untuk saldo, stok, dan tugas; bukan AI generatif.
 - **Family & Team:** tugas dan catatan keluarga.
 - **SATU Wealth:** pencatatan aset dan perhitungan ringkasan kekayaan bersih.
+- **Laporan SATUOS:** omzet penjualan, perkiraan harga pokok terjual, laba kotor perkiraan, pembelian stok, dan stok rendah.
 - **SATU Automation:** pengingat lokal dan notifikasi jika izin perangkat diberikan.
 - **Pengaturan:** ekspor JSON dan pemulihan cadangan JSON.
 
@@ -25,7 +26,7 @@ npx expo start
 ```
 
 ## Build APK
-Workflow `.github/workflows/android-apk.yml` menjalankan Expo prebuild dan Gradle `assembleDebug`, lalu mengunggah APK debug sebagai artefak jika berhasil. Jalankan melalui tab **Actions** atau push tag versi. APK debug untuk pengujian bukan APK release bertanda tangan untuk distribusi publik.
+Workflow `.github/workflows/android-apk.yml` berjalan pada pembaruan branch `main`, bisa dijalankan manual, dan menjalankan Expo prebuild dan Gradle `assembleDebug`, lalu mengunggah APK debug sebagai artefak jika berhasil. Jalankan melalui tab **Actions** atau push tag versi. APK debug untuk pengujian bukan APK release bertanda tangan untuk distribusi publik.
 
 ## Batasan yang diketahui
 - Sinkronisasi antarperangkat, akun cloud, OAuth, AI generatif, dan integrasi penerbitan media sosial otomatis belum aktif.
