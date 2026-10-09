@@ -1,37 +1,36 @@
 # Status implementasi SATUOS
 
-## Source code yang sudah ditambahkan
-- Expo Router + TypeScript dan dashboard responsif.
-- SQLite lokal dengan tabel transaksi, produk, tugas, aset, draf sosial, dan pemeriksaan Trust.
-- Pencatatan pemasukan/pengeluaran dan ringkasan saldo.
-- Katalog produk dan pencatatan penjualan yang mengurangi stok serta mencatat pemasukan dalam transaksi database yang sama.
-- Daftar tugas lokal dengan penanda selesai.
-- Catatan aset manual.
-- Draf sosial lokal, membuka tautan platform, dan berbagi teks native.
-- Pemeriksaan URL/pesan berbasis pola lokal.
-- Asisten lokal berbasis aturan.
-- Ekspor cadangan JSON.
-- Workflow GitHub Actions untuk pemeriksaan dan build APK debug.
+## Modul lokal yang telah ditambahkan
+- Dashboard responsif dengan status koneksi dasar.
+- SQLite lokal dengan migrasi versi 1 dan 2.
+- SATU Money: pemasukan/pengeluaran, kategori, riwayat, hapus transaksi, ekspor CSV, beberapa dompet, anggaran bulanan, dan catatan utang/piutang.
+- SATU Business: katalog produk, penjualan satuan, pembelian stok satuan, pencatatan biaya pembelian, pelanggan, dan pemasok.
+- SATU Social: draf caption lokal, tautan platform resmi, dan berbagi teks melalui menu native.
+- SATU Trust: pemeriksaan pola lokal untuk permintaan kode rahasia, hadiah yang meminta pembayaran, tautan pendek, dan HTTP tanpa TLS.
+- SATU AI: asisten berbasis aturan untuk ringkasan keuangan, stok, dan tugas; bukan model generatif.
+- Family & Team: tugas dan catatan keluarga lokal.
+- SATU Wealth: pencatatan aset serta ringkasan aset, utang, piutang, dan kekayaan bersih.
+- SATU Automation: pengingat disimpan secara lokal dan mencoba menjadwalkan notifikasi lokal setelah izin diberikan.
+- Pengaturan: ekspor JSON, pemulihan JSON dengan konfirmasi, dan ekspor transaksi CSV.
+- GitHub Actions untuk pemeriksaan TypeScript, tes helper, pemeriksaan dependensi Expo, dan build APK debug.
 
-## Belum diimplementasikan atau perlu konfigurasi
-- Pemulihan/impor cadangan JSON.
-- Anggaran, banyak dompet, pelanggan, pemasok, faktur, pembelian, piutang/utang terstruktur, grafik, dan laporan lengkap.
-- Pengingat terjadwal dan notifikasi lokal.
-- Sinkronisasi multi-perangkat dan autentikasi cloud.
-- OAuth/API penerbitan media sosial resmi.
-- AI generatif online atau model AI lokal.
-- Build APK yang berhasil diverifikasi di perangkat nyata.
+## Keterbatasan yang masih memerlukan konfigurasi atau pengembangan
+- Sinkronisasi multi-perangkat dan autentikasi cloud belum dibuat. Ini memerlukan backend yang dikonfigurasi serta autentikasi/otorisasi.
+- OAuth, penerbitan otomatis, pesan bisnis otomatis, dan analitik sosial belum aktif; konektor saat ini hanya membuka situs resmi dan berbagi secara eksplisit.
+- Integrasi Gmail/Drive/Calendar, pembayaran, pengiriman, faktur lengkap, dan pembelian multi-item belum tersedia.
+- Notifikasi lokal memerlukan izin pengguna dan perlu diverifikasi di perangkat Android sebenarnya.
+- Dompet dapat menyimpan saldo awal dan menampilkan transaksi yang ditautkan ke dompet; alokasi transaksi ke dompet belum tersedia di formulir transaksi.
+- Pemeriksaan Trust bersifat heuristik lokal, bukan pemeriksaan reputasi atau jaminan keamanan.
+- Build dan tes belum boleh dinyatakan lulus sampai hasil Actions aktual menunjukkan keberhasilan.
 
-## Konektor platform
-Konektor saat ini membuka URL resmi dan menggunakan menu berbagi native. Tidak ada status login palsu. Penerbitan otomatis, analitik, pembacaan pesan pribadi, dan sinkronisasi cloud belum aktif.
-
-## Menjalankan secara lokal
+## Menjalankan
 ```bash
 npm install
 npx expo install --check
 npx tsc --noEmit
+npm test -- --passWithNoTests
 npx expo start
 ```
 
-## Build
-Jalankan workflow **Build APK Android SATUOS** dari tab Actions atau push tag versi. Artefak debug APK tersedia hanya setelah workflow berhasil. APK release untuk distribusi publik memerlukan proses signing dengan keystore yang disimpan aman, bukan di repository.
+## Build APK
+Buka tab Actions dan jalankan workflow **Build APK Android SATUOS**. Workflow membangun APK debug dan mengunggahnya sebagai artefak jika seluruh langkah berhasil. APK debug untuk pengujian tidak sama dengan APK release bertanda tangan untuk distribusi publik. Jangan commit keystore, kata sandi, atau token.
