@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "SATUOS",
+    "slug": "satuos",
+    "scheme": "satuos",
+    "version": "1.0.0",
+    "orientation": "default",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "plugins": [
+      "expo-router",
+      [
+        "expo-sqlite",
+        {
+          "enableFTS": false
+        }
+      ]
+    ],
+    "android": {
+      "package": "id.mazkiplay.satuos",
+      "versionCode": 1,
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ]
+    },
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
