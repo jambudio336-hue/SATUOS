@@ -5,7 +5,7 @@ import {useLocalSearchParams,useRouter} from 'expo-router';
 import {addProduct,listProducts,sellOne,purchaseStock,Product,addTask,listTasks,toggleTask,Task,addAsset,listAssets,Asset,addDraft,listDrafts,addCheck,listChecks,exportData,restoreData,addTransaction,listTransactions,Transaction,deleteTransaction,addBudget,listBudgets,Budget,addWallet,listWallets,Wallet,addDebt,listDebts,settleDebt,Debt,addContact,listContacts,Contact,addReminder,listReminders,Reminder,addNote,listNotes,Note,wealthSummary,businessSummary,exportCsvTransactions} from '../lib/database';
 import {platforms,openPlatform,shareText} from '../lib/platforms';
 import {rupiah,nominal} from '../lib/format';
-import * as FileSystem from 'expo-file-system/legacy';
+import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as Notifications from 'expo-notifications';
 import * as DocumentPicker from 'expo-document-picker';
