@@ -1,4 +1,4 @@
-import {useCallback,useEffect,useMemo,useState} from 'react';
+import {useCallback,useEffect,useState} from 'react';
 import {View,Text,TextInput,Pressable,ScrollView,StyleSheet,Alert,KeyboardAvoidingView,Platform} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useLocalSearchParams,useRouter} from 'expo-router';
@@ -7,10 +7,11 @@ import {platforms,openPlatform,shareText} from '../lib/platforms';
 import {rupiah,nominal} from '../lib/format';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
+import * as Notifications from 'expo-notifications';
 
 export default function ModulePage(){
  const router=useRouter();const params=useLocalSearchParams<{module:string}>();const id=String(params.module||'');
- const titles:Record<string,string>={money:'SATU Money',business:'SATU Business',social:'SATU Social',trust:'SATU Trust',assistant:'SATU AI',tasks:'Family & Team',wealth:'SATU Wealth',settings:'Pengaturan',automation:'SATU Automation'};
+ const titles:Record<string,string>={money:'SATU Money',business:'SATU Business',social:'SATU Social',trust:'SATU Trust',assistant:'SATU AI',tasks:'Family & Team',wealth:'SATU Wealth',settings:'Pengaturan',automation:'SATU Automation',family:'Family & Team'};
  const title=titles[id]||'SATUOS';
  const [name,setName]=useState(''),[a,setA]=useState(''),[b,setB]=useState(''),[c,setC]=useState(''),[d,setD]=useState(''),[items,setItems]=useState<any[]>([]),[platform,setPlatform]=useState('WhatsApp'),[kind,setKind]=useState('pengeluaran'),[category,setCategory]=useState('Umum'),[answer,setAnswer]=useState('Asisten lokal berbasis aturan. Coba kata kunci saldo, stok, tugas, atau promosi.'),[backupText,setBackupText]=useState(''),[month,setMonth]=useState(new Date().toISOString().slice(0,7)),[subtab,setSubtab]=useState('transaksi');
  const load=useCallback(async()=>{try{
@@ -33,7 +34,7 @@ export default function ModulePage(){
   else if(id==='social'){await addDraft(platform,a);setA('');Alert.alert('Draf tersimpan','Konten belum dipublikasikan.')}
   else if(id==='trust'){if(!name.trim())throw Error('Tempel URL atau pesan terlebih dahulu.');const reasons:string[]=[];if(/(otp|pin|kata sandi|password|kode verifikasi)/i.test(name))reasons.push('Meminta kode rahasia atau kredensial.');if(/(hadiah|menang|gratis).{0,50}(transfer|biaya admin)/i.test(name))reasons.push('Janji hadiah disertai permintaan pembayaran.');if(/bit\.ly|tinyurl\.com|t\.co/i.test(name))reasons.push('Tautan pemendek; periksa tujuan akhir.');if(/^http:\/\//i.test(name))reasons.push('Alamat menggunakan HTTP tanpa enkripsi TLS.');const verdict=reasons.length?'Perlu diwaspadai':'Tidak ditemukan pola umum';await addCheck(name,verdict,reasons.join('\n')||'Aturan lokal tidak menemukan pola umum; bukan jaminan aman.');setAnswer(verdict+'\n'+(reasons.join('\n')||'Tetap verifikasi pengirim dan domain.'));setName('')}
   else if(id==='assistant'){const q=name.toLowerCase();if(q.includes('stok')){const p=await listProducts();setAnswer(p.map(x=>x.name+': '+x.stock+' unit').join('\n')||'Belum ada produk.')}else if(q.includes('tugas')){const t=await listTasks();setAnswer(t.filter(x=>!x.done).map(x=>x.title).join('\n')||'Tidak ada tugas tertunda.')}else if(q.includes('saldo')||q.includes('keuangan')){const t=await listTransactions();const inc=t.filter(x=>x.kind==='pemasukan').reduce((n,x)=>n+x.amount,0),exp=t.filter(x=>x.kind==='pengeluaran').reduce((n,x)=>n+x.amount,0);setAnswer('Pemasukan tercatat: '+rupiah(inc)+'\nPengeluaran tercatat: '+rupiah(exp)+'\nSaldo bersih: '+rupiah(inc-exp))}else setAnswer('Saya asisten lokal berbasis aturan. Coba tanyakan saldo, stok, atau tugas.')}
-  else if(id==='automation'){await addReminder(name,b);setName('');setB('')}
+  else if(id==='automation'){const when=new Date(b.trim().replace(' ','T'));if(!Number.isFinite(when.getTime())||when.getTime()<=Date.now())throw Error('Waktu harus valid dan berada di masa depan. Gunakan YYYY-MM-DD HH:mm.');await addReminder(name,when.toISOString());try{const permission=await Notifications.requestPermissionsAsync();if(permission.granted){await Notifications.setNotificationChannelAsync('satuos-pengingat',{name:'Pengingat SATUOS',importance:Notifications.AndroidImportance.DEFAULT});await Notifications.scheduleNotificationAsync({content:{title:'Pengingat SATUOS',body:name,sound:true},trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:when,channelId:'satuos-pengingat'}});Alert.alert('Pengingat disimpan','Pengingat lokal dijadwalkan pada '+when.toLocaleString('id-ID'))}else Alert.alert('Pengingat disimpan','Izin notifikasi ditolak. Pengingat tersimpan, tetapi pemberitahuan tidak dijadwalkan.')}catch(e){Alert.alert('Pengingat disimpan','Data tersimpan, tetapi notifikasi tidak berhasil dijadwalkan. Periksa izin notifikasi perangkat.')}setName('');setB('')}
   else if(id==='family'){await addNote(name,a,'keluarga');setName('');setA('')}
   await load()
  }catch(e){Alert.alert('Tidak dapat menyimpan',e instanceof Error?e.message:'Kesalahan')}};
@@ -42,7 +43,6 @@ export default function ModulePage(){
  const restore=async()=>{try{if(!backupText.trim())throw Error('Tempel isi berkas cadangan JSON terlebih dahulu.');Alert.alert('Konfirmasi pemulihan','Pemulihan akan mengganti data lokal pada tabel yang terdapat di cadangan. Ekspor cadangan saat ini terlebih dahulu.',[{text:'Batal',style:'cancel'},{text:'Pulihkan data',style:'destructive',onPress:async()=>{try{await restoreData(backupText);setBackupText('');Alert.alert('Pemulihan selesai','Data cadangan sudah dimasukkan.');await load()}catch(e){Alert.alert('Pemulihan gagal',e instanceof Error?e.message:'Kesalahan')}}}])}catch(e){Alert.alert('Tidak dapat memulihkan',e instanceof Error?e.message:'Kesalahan')}};
  const sell=async(p:Product)=>{try{await sellOne(p.id);await load();Alert.alert('Penjualan tercatat','Stok berkurang satu dan pemasukan dicatat.')}catch(e){Alert.alert('Gagal',e instanceof Error?e.message:'Kesalahan')}};
  const buy=async(p:Product)=>{try{await purchaseStock(p.id,1,p.cost);await load();Alert.alert('Pembelian dicatat','Stok bertambah satu dan biaya pembelian dicatat.')}catch(e){Alert.alert('Gagal',e instanceof Error?e.message:'Kesalahan')}};
- const wealth=useMemo(()=>null,[]);
  const tabs=(values:string[])=> <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginTop:16,marginBottom:8}}>{values.map(v=><Pressable key={v} onPress={()=>setSubtab(v)} style={[s.chip,subtab===v&&s.selected]}><Text style={s.buttonText}>{({transaksi:'Transaksi',dompet:'Dompet',anggaran:'Anggaran',utang:'Utang/piutang',kontak:'Kontak'})[v]||v}</Text></Pressable>)}</ScrollView>;
  const field=(value:string,set:(v:string)=>void,placeholder:string,keyboardType:any='default',multiline=false)=><TextInput value={value} onChangeText={set} placeholder={placeholder} placeholderTextColor="#718096" keyboardType={keyboardType} multiline={multiline} style={[s.input,multiline&&{minHeight:90}]}/>;
  const btn=(label:string,onPress:()=>void)=><Pressable style={s.button} onPress={onPress}><Text style={s.buttonText}>{label}</Text></Pressable>;
