@@ -1,0 +1,5 @@
+import * as Linking from 'expo-linking';
+import {Share,Platform} from 'react-native';
+export const platforms=[{name:'WhatsApp',url:'https://wa.me/',features:'Buka layanan dan berbagi melalui menu perangkat'},{name:'Instagram',url:'https://www.instagram.com/',features:'Buka layanan dan simpan draf caption'},{name:'Facebook',url:'https://www.facebook.com/',features:'Buka layanan dan berbagi tautan'},{name:'TikTok',url:'https://www.tiktok.com/',features:'Buka layanan dan simpan ide konten'},{name:'Telegram',url:'https://t.me/',features:'Buka layanan'},{name:'YouTube',url:'https://www.youtube.com/',features:'Buka layanan'},{name:'Gmail',url:'https://mail.google.com/',features:'Buka layanan'},{name:'LinkedIn',url:'https://www.linkedin.com/',features:'Buka layanan'},{name:'X',url:'https://x.com/',features:'Buka layanan'},{name:'Discord',url:'https://discord.com/app',features:'Buka layanan'}];
+export async function openPlatform(url:string){await Linking.openURL(url)}
+export async function shareText(message:string){if(Platform.OS==='web')throw Error('Berbagi perangkat memerlukan aplikasi native.');return Share.share({message})}
