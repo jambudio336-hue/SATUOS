@@ -13,7 +13,7 @@ import BottomNav from '../components/BottomNav';
 
 export default function ModulePage(){
  const router=useRouter();const params=useLocalSearchParams<{module:string}>();const id=String(params.module||'');
- const titles:Record<string,string>={money:'SATU Money',business:'SATU Business',social:'SATU Social',trust:'SATU Trust',assistant:'SATU AI',tasks:'Family & Team',wealth:'SATU Wealth',settings:'Pengaturan',automation:'SATU Automation',family:'Family & Team',reports:'Laporan SATUOS'};
+ const titles:Record<string,string>={money:'SATU Money',business:'SATU Business',social:'SATU Social',trust:'SATU Trust',assistant:'Jarvis · SATU AI',tasks:'Family & Team',wealth:'SATU Wealth',settings:'Pengaturan',automation:'SATU Automation',family:'Family & Team',reports:'Laporan SATUOS'};
  const title=titles[id]||'SATUOS';
  const [name,setName]=useState(''),[a,setA]=useState(''),[b,setB]=useState(''),[c,setC]=useState(''),[d,setD]=useState(''),[items,setItems]=useState<any[]>([]),[platform,setPlatform]=useState('WhatsApp'),[kind,setKind]=useState('pengeluaran'),[category,setCategory]=useState('Umum'),[answer,setAnswer]=useState('Asisten lokal berbasis aturan. Coba kata kunci saldo, stok, tugas, atau promosi.'),[backupText,setBackupText]=useState(''),[month,setMonth]=useState(new Date().toISOString().slice(0,7)),[subtab,setSubtab]=useState('transaksi'),[wallets,setWallets]=useState<Wallet[]>([]),[selectedWallet,setSelectedWallet]=useState<number|null>(null);
  const load=useCallback(async()=>{try{
