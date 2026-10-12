@@ -1,3 +1,7 @@
+## 1.2.1 — 2026-10-13
+
+- Menambahkan transisi navigasi fade-from-bottom berdurasi 320 ms dan mendukung gesture kembali agar perpindahan halaman terasa lebih mulus.
+
 ## 1.2.0 — 2026-10-13
 
 - Identitas M4zk1pL4y.Dev ditampilkan pada dashboard dan seluruh modul, dengan versi Android dinaikkan ke versionCode 3.

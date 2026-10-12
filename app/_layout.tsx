@@ -42,7 +42,13 @@ export default function Layout() {
       <StatusBar style="light" />
       {checkingIntro ? <View style={styles.loading} /> : showIntro ? <FirstLaunchIntro onFinished={() => setShowIntro(false)} /> : (
         // Database initialization remains lazy to avoid migration races on cold start.
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#090D16' } }} />
+        <Stack screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: '#090D16' },
+          animation: 'fade_from_bottom',
+          animationDuration: 320,
+          gestureEnabled: true,
+        }} />
       )}
     </SafeAreaProvider>
   );

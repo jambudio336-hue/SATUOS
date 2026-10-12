@@ -4,6 +4,11 @@
 
 SATUOS adalah aplikasi Android local-first berbasis Expo, React Native, TypeScript, dan SQLite. Fitur inti tetap dapat digunakan tanpa akun cloud atau API key berbayar. Antarmuka aplikasi menggunakan Bahasa Indonesia.
 
+## Yang baru di 1.2.1
+
+- Transisi antarhalaman fade-from-bottom selama 320 ms dengan dukungan gesture kembali.
+- Versi Android dinaikkan menjadi 1.2.1 / versionCode 4.
+
 ## Yang baru di 1.2.0
 
 - Refresh identitas premium M4zk1pL4y.Dev, animasi sentuh, dan penghapusan catatan keluarga dengan konfirmasi.
@@ -21,7 +26,7 @@ SATUOS adalah aplikasi Android local-first berbasis Expo, React Native, TypeScri
 | Properti | Nilai |
 |---|---|
 | Package Android | `id.mazkiplay.satuos` |
-| Versi | `1.2.0` |
+| Versi | `1.2.1` |
 | Mata uang | Rupiah (IDR) |
 | Penyimpanan inti | SQLite lokal pada perangkat |
 | Runtime | Expo SDK 57, React Native 0.86 |
