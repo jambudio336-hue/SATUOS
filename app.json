@@ -27,7 +27,8 @@
           "enableFTS": false
         }
       ],
-      "expo-notifications"
+      "expo-notifications",
+      "expo-sharing"
     ],
     "android": {
       "package": "id.mazkiplay.satuos",
