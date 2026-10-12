@@ -1,10 +1,15 @@
 name: Pemeriksaan SATUOS
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
   quality:
     runs-on: ubuntu-latest
@@ -12,8 +17,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - run: npm install
-      - run: npx tsc --noEmit
-      - run: npm test -- --passWithNoTests
-      - run: npx expo install --check
+          node-version: 22
+          cache: npm
+      - name: Pasang dependency terkunci
+        run: npm ci
+      - name: Periksa dependency Expo
+        run: npx expo install --check
+      - name: Expo Doctor
+        run: npx --yes expo-doctor
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Tes otomatis
+        run: npm test
+      - name: Lint
+        run: npm run lint

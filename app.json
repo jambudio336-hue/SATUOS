@@ -3,18 +3,24 @@
     "name": "SATUOS",
     "slug": "satuos",
     "scheme": "satuos",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "icon": "./assets/images/icon.png",
-    "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#070B16"
-    },
     "orientation": "default",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
+    "userInterfaceStyle": "dark",
     "plugins": [
       "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#070B16"
+        }
+      ],
+      "expo-font",
+      "expo-audio",
+      "expo-video",
       [
         "expo-sqlite",
         {
@@ -25,7 +31,7 @@
     ],
     "android": {
       "package": "id.mazkiplay.satuos",
-      "versionCode": 1,
+      "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",

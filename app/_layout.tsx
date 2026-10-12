@@ -1,8 +1,8 @@
-import { Stack, ErrorBoundaryProps } from 'expo-router';
+import { ErrorBoundaryProps, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import FirstLaunchIntro, { shouldShowFirstLaunchIntro } from '../components/FirstLaunchIntro';
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
@@ -12,13 +12,9 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
       <View style={styles.errorPage}>
         <Text style={styles.brand}>SATUOS</Text>
         <Text style={styles.title}>Terjadi gangguan</Text>
-        <Text style={styles.message}>
-          SATUOS mengalami kesalahan saat membuka halaman. Data lokal tidak sengaja dihapus.
-        </Text>
+        <Text style={styles.message}>SATUOS mengalami kesalahan saat membuka halaman. Data lokal tidak sengaja dihapus.</Text>
         <Text style={styles.details}>{error.message}</Text>
-        <Pressable accessibilityRole="button" onPress={retry} style={styles.button}>
-          <Text style={styles.buttonText}>Coba buka lagi</Text>
-        </Pressable>
+        <Pressable accessibilityRole="button" onPress={retry} style={styles.button}><Text style={styles.buttonText}>Coba buka lagi</Text></Pressable>
       </View>
     </SafeAreaProvider>
   );
@@ -27,23 +23,27 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 export default function Layout() {
   const [checkingIntro, setCheckingIntro] = useState(true);
   const [showIntro, setShowIntro] = useState(false);
-
   useEffect(() => {
-    shouldShowFirstLaunchIntro().then((show) => {
+    let mounted = true;
+    void shouldShowFirstLaunchIntro().then((show) => {
+      if (!mounted) return;
       setShowIntro(show);
       setCheckingIntro(false);
+    }).catch(() => {
+      if (!mounted) return;
+      setShowIntro(false);
+      setCheckingIntro(false);
     });
+    return () => { mounted = false; };
   }, []);
 
-  if (checkingIntro) return <View style={styles.loading} />;
-  if (showIntro) return <FirstLaunchIntro onFinished={() => setShowIntro(false)} />;
-
-  // Database initialization is intentionally lazy. Running migrations here and
-  // again from a screen could race on cold start.
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#0B1220' } }} />
+      {checkingIntro ? <View style={styles.loading} /> : showIntro ? <FirstLaunchIntro onFinished={() => setShowIntro(false)} /> : (
+        // Database initialization remains lazy to avoid migration races on cold start.
+        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#090D16' } }} />
+      )}
     </SafeAreaProvider>
   );
 }

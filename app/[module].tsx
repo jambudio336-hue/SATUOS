@@ -5,22 +5,25 @@ import {useLocalSearchParams,useRouter} from 'expo-router';
 import {addProduct,listProducts,sellOne,purchaseStock,Product,addTask,listTasks,toggleTask,Task,addAsset,listAssets,Asset,addDraft,listDrafts,addCheck,listChecks,exportData,restoreData,addTransaction,listTransactions,Transaction,deleteTransaction,addBudget,listBudgets,Budget,addWallet,listWallets,Wallet,addDebt,listDebts,settleDebt,Debt,addContact,listContacts,Contact,addReminder,listReminders,Reminder,addNote,listNotes,Note,wealthSummary,businessSummary,exportCsvTransactions} from '../lib/database';
 import {platforms,openPlatform,shareText} from '../lib/platforms';
 import {rupiah,nominal} from '../lib/format';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import * as Notifications from 'expo-notifications';
 import * as DocumentPicker from 'expo-document-picker';
 import BottomNav from '../components/BottomNav';
 
+const isFutureDate = (date: Date) => date.getTime() > Date.now();
+
 export default function ModulePage(){
  const router=useRouter();const params=useLocalSearchParams<{module:string}>();const id=String(params.module||'');
  const titles:Record<string,string>={money:'SATU Money',business:'SATU Business',social:'SATU Social',trust:'SATU Trust',assistant:'Jarvis · SATU AI',tasks:'Family & Team',wealth:'SATU Wealth',settings:'Pengaturan',automation:'SATU Automation',family:'Family & Team',reports:'Laporan SATUOS'};
  const title=titles[id]||'SATUOS';
- const [name,setName]=useState(''),[a,setA]=useState(''),[b,setB]=useState(''),[c,setC]=useState(''),[d,setD]=useState(''),[items,setItems]=useState<any[]>([]),[platform,setPlatform]=useState('WhatsApp'),[kind,setKind]=useState('pengeluaran'),[category,setCategory]=useState('Umum'),[answer,setAnswer]=useState('Asisten lokal berbasis aturan. Coba kata kunci saldo, stok, tugas, atau promosi.'),[backupText,setBackupText]=useState(''),[month,setMonth]=useState(new Date().toISOString().slice(0,7)),[subtab,setSubtab]=useState('transaksi'),[wallets,setWallets]=useState<Wallet[]>([]),[selectedWallet,setSelectedWallet]=useState<number|null>(null);
+ const [name,setName]=useState(''),[a,setA]=useState(''),[b,setB]=useState(''),[c,setC]=useState(''),[items,setItems]=useState<any[]>([]),[platform,setPlatform]=useState('WhatsApp'),[kind,setKind]=useState('pengeluaran'),[category,setCategory]=useState('Umum'),[answer,setAnswer]=useState('Asisten lokal berbasis aturan. Coba kata kunci saldo, stok, tugas, atau promosi.'),[backupText,setBackupText]=useState(''),[month,setMonth]=useState(new Date().toISOString().slice(0,7)),[subtab,setSubtab]=useState('transaksi'),[wallets,setWallets]=useState<Wallet[]>([]),[selectedWallet,setSelectedWallet]=useState<number|null>(null);
  const load=useCallback(async()=>{try{
   if(id==='money'){setWallets(await listWallets());if(subtab==='transaksi')setItems(await listTransactions());else if(subtab==='dompet')setItems(await listWallets());else if(subtab==='anggaran')setItems(await listBudgets(month));else if(subtab==='utang')setItems(await listDebts())}
   else if(id==='business'){if(subtab==='kontak')setItems(await listContacts(kind==='pemasukan'?'pelanggan':'pemasok'));else setItems(await listProducts())}
   else if(id==='tasks')setItems(await listTasks());else if(id==='wealth')setItems(await listAssets());else if(id==='social')setItems(await listDrafts());else if(id==='trust')setItems(await listChecks());else if(id==='automation')setItems(await listReminders());else if(id==='family')setItems(await listNotes())
  }catch(e){Alert.alert('Gagal memuat data',e instanceof Error?e.message:'Kesalahan')}} ,[id,subtab,month,kind]);
+ // eslint-disable-next-line react-hooks/set-state-in-effect -- Membaca SQLite secara asinkron saat modul dibuka.
  useEffect(()=>{load()},[load]);
  const action=async()=>{try{
   if(id==='money'){
@@ -50,7 +53,7 @@ export default function ModulePage(){
    else setAnswer('Saya Jarvis lokal SATUOS. Saat ini saya membaca data yang tersimpan di perangkat, bukan internet. Coba tanyakan: saldo, stok produk, tugas, utang/piutang, aset/kekayaan, anggaran, omzet/laba, pengingat, atau kontak.');
    setName('');
   }
-  else if(id==='automation'){const when=new Date(b.trim().replace(' ','T'));if(!Number.isFinite(when.getTime())||when.getTime()<=Date.now())throw Error('Waktu harus valid dan berada di masa depan. Gunakan YYYY-MM-DD HH:mm.');await addReminder(name,when.toISOString());try{const permission=await Notifications.requestPermissionsAsync();if(permission.granted){await Notifications.setNotificationChannelAsync('satuos-pengingat',{name:'Pengingat SATUOS',importance:Notifications.AndroidImportance.DEFAULT});await Notifications.scheduleNotificationAsync({content:{title:'Pengingat SATUOS',body:name,sound:true},trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:when,channelId:'satuos-pengingat'}});Alert.alert('Pengingat disimpan','Pengingat lokal dijadwalkan pada '+when.toLocaleString('id-ID'))}else Alert.alert('Pengingat disimpan','Izin notifikasi ditolak. Pengingat tersimpan, tetapi pemberitahuan tidak dijadwalkan.')}catch(e){Alert.alert('Pengingat disimpan','Data tersimpan, tetapi notifikasi tidak berhasil dijadwalkan. Periksa izin notifikasi perangkat.')}setName('');setB('')}
+  else if(id==='automation'){const when=new Date(b.trim().replace(' ','T'));if(!Number.isFinite(when.getTime())||!isFutureDate(when))throw Error('Waktu harus valid dan berada di masa depan. Gunakan YYYY-MM-DD HH:mm.');await addReminder(name,when.toISOString());try{const permission=await Notifications.requestPermissionsAsync();if(permission.granted){await Notifications.setNotificationChannelAsync('satuos-pengingat',{name:'Pengingat SATUOS',importance:Notifications.AndroidImportance.DEFAULT});await Notifications.scheduleNotificationAsync({content:{title:'Pengingat SATUOS',body:name,sound:true},trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:when,channelId:'satuos-pengingat'}});Alert.alert('Pengingat disimpan','Pengingat lokal dijadwalkan pada '+when.toLocaleString('id-ID'))}else Alert.alert('Pengingat disimpan','Izin notifikasi ditolak. Pengingat tersimpan, tetapi pemberitahuan tidak dijadwalkan.')}catch{Alert.alert('Pengingat disimpan','Data tersimpan, tetapi notifikasi tidak berhasil dijadwalkan. Periksa izin notifikasi perangkat.')}setName('');setB('')}
   else if(id==='family'){await addNote(name,a,'keluarga');setName('');setA('')}
   await load()
  }catch(e){Alert.alert('Tidak dapat menyimpan',e instanceof Error?e.message:'Kesalahan')}};

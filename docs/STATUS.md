@@ -1,38 +1,39 @@
 # Status implementasi SATUOS
 
-## Modul lokal yang telah ditambahkan
-- Dashboard responsif dengan status koneksi dasar.
-- SQLite lokal dengan migrasi versi 1 dan 2.
-- SATU Money: pemasukan/pengeluaran, kategori, riwayat, hapus transaksi, ekspor CSV, beberapa dompet, anggaran bulanan, dan catatan utang/piutang.
-- SATU Business: katalog produk, penjualan satuan, pembelian stok satuan, pencatatan biaya pembelian, pelanggan, pemasok, serta pencatatan harga pokok pada saat penjualan.
-- SATU Social: draf caption lokal, tautan platform resmi, dan berbagi teks melalui menu native.
-- SATU Trust: pemeriksaan pola lokal untuk permintaan kode rahasia, hadiah yang meminta pembayaran, tautan pendek, dan HTTP tanpa TLS.
-- SATU AI: asisten berbasis aturan untuk ringkasan keuangan, stok, dan tugas; bukan model generatif.
-- Family & Team: tugas dan catatan keluarga lokal.
-- SATU Wealth: pencatatan aset serta ringkasan aset, utang, piutang, dan kekayaan bersih.
-- Laporan SATUOS: omzet penjualan, estimasi harga pokok barang terjual, estimasi laba kotor, pembelian stok, dan peringatan stok rendah.
-- SATU Automation: pengingat disimpan secara lokal dan mencoba menjadwalkan notifikasi lokal setelah izin diberikan.
-- Pengaturan: ekspor JSON, pemulihan JSON dengan konfirmasi, dan ekspor transaksi CSV.
-- GitHub Actions untuk pemeriksaan TypeScript, tes helper, pemeriksaan dependensi Expo, dan build APK debug.
+Status dokumen: 12 Oktober 2026 · rilis kode 1.1.0.
 
-## Keterbatasan yang masih memerlukan konfigurasi atau pengembangan
-- Sinkronisasi multi-perangkat dan autentikasi cloud belum dibuat. Ini memerlukan backend yang dikonfigurasi serta autentikasi/otorisasi.
-- OAuth, penerbitan otomatis, pesan bisnis otomatis, dan analitik sosial belum aktif; konektor saat ini hanya membuka situs resmi dan berbagi secara eksplisit.
-- Integrasi Gmail/Drive/Calendar, pembayaran, pengiriman, faktur lengkap, dan pembelian multi-item belum tersedia.
-- Notifikasi lokal memerlukan izin pengguna dan perlu diverifikasi di perangkat Android sebenarnya.
-- Dompet dapat menyimpan saldo awal dan menampilkan transaksi yang ditautkan ke dompet; alokasi transaksi ke dompet belum tersedia di formulir transaksi.
-- Pemeriksaan Trust bersifat heuristik lokal, bukan pemeriksaan reputasi atau jaminan keamanan.
-- Build dan tes belum boleh dinyatakan lulus sampai hasil Actions aktual menunjukkan keberhasilan.
-- Faktur lengkap, pembelian multi-item, dan laporan akuntansi/pajak resmi belum tersedia.
+## Implementasi yang tersedia
 
-## Menjalankan
+- Dashboard responsif dengan status jaringan, ringkasan keuangan, pencarian modul, aktivitas terakhir, dan aksi cepat.
+- SQLite lokal dengan migrasi additive; SATU Money mendukung transaksi, kategori, dompet, anggaran, utang/piutang, riwayat, dan ekspor CSV.
+- SATU Business menyediakan katalog produk, stok, penjualan/pembelian satuan, kontak, dan perhitungan harga pokok/laba kotor perkiraan.
+- SATU Wealth menghitung aset, utang, piutang, dan kekayaan bersih perkiraan.
+- SATU Social menyimpan draf dan membuka situs resmi; SATU Trust menjalankan pemeriksaan pola lokal; Jarvis menjawab pertanyaan sederhana dari data perangkat.
+- Family & Team, tugas, dan pengingat lokal dengan notifikasi opsional setelah izin diberikan.
+- Backup/pemulihan JSON, ekspor CSV, dan laporan PDF yang berisi ringkasan serta tabel dari semua tabel data yang diekspor aplikasi.
+- Intro first-launch menampilkan video dan audio selama 10 detik pada instalasi pertama; audio berhenti saat timer selesai.
+- Expo SDK 57, React Native 0.86, Android prebuild, dan workflow GitHub Actions untuk pemeriksaan serta APK.
+
+## Hasil audit dependency
+
+Pada 12 Oktober 2026, `npm audit` menandai 65 advisori (17 moderate, 48 high, 0 critical); `npm audit --omit=dev` menandai 43 advisori pada dependency graph non-dev. Banyak isu bersumber dari toolchain upstream dan versi native terbaru yang masih dibatasi SDK57. `npm audit fix --force` akan menurunkan Expo ke SDK44 atau mengganti dependency native yang tidak kompatibel, sehingga tidak diterapkan. Detail ada di [SECURITY.md](SECURITY.md); hasil pemeriksaan bukan klaim bebas kerentanan.
+
+## Batasan dan perhatian
+
+- PDF dapat mencakup data sensitif seperti kontak, catatan, draf, transaksi, dan aktivitas. Pengguna memilih lokasi simpan dan harus memeriksa penerima sebelum membagikan.
+- Audio pihak ketiga yang disediakan pemilik proyek bukan bagian dari lisensi MIT. Hak distribusi harus dipastikan oleh pemilik proyek sebelum publikasi.
+- Sinkronisasi multi-perangkat, cloud login, OAuth, penerbitan sosial otomatis, bank, pembayaran, kalender, dan AI generatif belum diimplementasikan.
+- Konektor sosial hanya membuka layanan; tidak ada pengakuan bahwa akun telah terhubung.
+- Pemeriksaan Trust bersifat heuristik lokal, bukan pemeriksaan reputasi daring atau jaminan keamanan.
+- Estimasi laba/kekayaan bukan laporan pajak atau akuntansi resmi. Dompet hanya menghitung transaksi yang benar-benar ditautkan.
+- APK release hanya dinyatakan berhasil setelah workflow signing di GitHub Actions sukses dan file release tersedia.
+
+## Pemeriksaan lokal
+
 ```bash
-npm install
+npm ci
 npx expo install --check
-npx tsc --noEmit
-npm test -- --passWithNoTests
-npx expo start
+npx --yes expo-doctor
+npm run typecheck
+npm test
 ```
-
-## Build APK
-Buka tab Actions dan jalankan workflow **Build APK Android SATUOS**. Workflow membangun APK debug dan mengunggahnya sebagai artefak jika seluruh langkah berhasil. APK debug untuk pengujian tidak sama dengan APK release bertanda tangan untuk distribusi publik. Jangan commit keystore, kata sandi, atau token.

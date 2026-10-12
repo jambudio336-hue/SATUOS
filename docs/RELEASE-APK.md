@@ -1,53 +1,38 @@
 # Panduan APK release SATUOS
 
-## Status build
+## Persyaratan dan quality gate
 
-- Setiap push ke `main` menjalankan pemeriksaan dan membangun APK debug untuk pengujian.
-- APK release bertanda tangan hanya dibuat jika tiga GitHub Actions Secrets signing telah diatur.
-- Tag versi seperti `v1.0.1` memublikasikan APK release ke halaman GitHub Releases apabila build release bertanda tangan berhasil.
-- Jangan pernah commit keystore atau kata sandinya ke repository.
+Proyek menggunakan Expo SDK 57, Node.js 22, dan Java 17 pada GitHub Actions. Workflow memeriksa dependency Expo, Expo Doctor, TypeScript, dan tes otomatis sebelum prebuild Android. Setiap push ke `main` membangun APK debug. Tag versi seperti `v1.1.0` membangun APK release bertanda tangan apabila repository secrets tersedia.
 
-## Menyiapkan keystore dengan aman
+## Menjaga signing key
 
-Jalankan di komputer sendiri yang memasang JDK. Simpan berkas keystore di lokasi privat, bukan di folder repository:
+Keystore menentukan identitas pembaruan aplikasi. Kehilangan kunci dapat membuat APK berikutnya tidak dapat memperbarui instalasi yang ditandatangani dengan key tersebut. Simpan keystore dan password di tempat privat yang aman; jangan commit, kirim ke issue, atau tampilkan di log.
+
+Contoh pembuatan keystore lokal dengan JDK:
 
 ```bash
 keytool -genkeypair -v -keystore satuos-release.jks -alias satuos -keyalg RSA -keysize 2048 -validity 10000
 ```
 
-Ingat dan simpan kata sandi serta alias dengan aman. Kehilangan keystore dapat menghalangi pembaruan aplikasi yang ditandatangani dengan identitas yang sama.
+Konversi ke Base64 tanpa memecah baris:
 
-Ubah keystore menjadi Base64 untuk dimasukkan sebagai secret:
-
-Linux:
 ```bash
+# Linux
 base64 -w 0 satuos-release.jks
+
+# macOS
+base64 < satuos-release.jks | tr -d '\n'
 ```
 
-macOS:
-```bash
-base64 < satuos-release.jks | tr -d '\\n'
-```
+## GitHub Actions secrets
 
-## Menambahkan GitHub Actions Secrets
-
-Di repo SATUOS, buka **Settings → Secrets and variables → Actions → New repository secret**. Buat secret berikut:
-
-- `SATUOS_KEYSTORE_BASE64`: hasil Base64 dari berkas `.jks`.
-- `SATUOS_KEYSTORE_PASSWORD`: kata sandi keystore.
-- `SATUOS_KEY_PASSWORD`: kata sandi key.
-
-Workflow membaca alias key langsung dari keystore menggunakan `keytool`, sehingga nilai alias lama tidak lagi dipakai. Pastikan kata sandi key cocok dengan alias pertama yang ada di keystore.
-
-Jangan kirim nilai secret ke chat, issue, log, atau source code.
+Di repository SATUOS buka **Settings → Secrets and variables → Actions** lalu simpan tiga secrets berikut: `SATUOS_KEYSTORE_BASE64` (isi Base64 `.jks`), `SATUOS_KEYSTORE_PASSWORD`, dan `SATUOS_KEY_PASSWORD`. Alias pertama dibaca workflow dari keystore; password key harus cocok dengan alias tersebut. Jangan menyimpan password dalam README atau file workflow.
 
 ## Build dan unduh
 
-1. Pastikan workflow Actions sudah aktif.
-2. Push perubahan ke branch `main` untuk menjalankan tes dan build APK debug.
-3. Untuk release, setelah secret siap, buat tag versi baru, misalnya `v1.0.1`, lalu push tag tersebut.
-4. Buka tab **Actions** dan pastikan seluruh job berstatus sukses.
-5. Unduh APK debug dari bagian Artifacts pada workflow run untuk pengujian.
-6. Untuk release, buka halaman **Releases** dan unduh `app-release.apk` setelah file benar-benar tersedia.
+1. Pastikan quality workflow berhasil di branch `main`.
+2. Push tag versi yang belum pernah digunakan, misalnya `v1.1.0`.
+3. Pantau tab **Actions** sampai build release bertanda tangan sukses.
+4. Unduh APK dari artifact workflow untuk debug, atau buka **Releases** untuk APK release publik.
 
-APK debug bukan pengganti APK release bertanda tangan. Jangan menyebut release berhasil sampai workflow sukses dan APK release tersedia.
+Workflow tidak memublikasikan APK release ketika secret signing tidak tersedia atau build gagal. APK debug bukan pengganti release bertanda tangan.
