@@ -3,7 +3,7 @@
 ## Status build
 
 - Setiap push ke `main` menjalankan pemeriksaan dan membangun APK debug untuk pengujian.
-- APK release bertanda tangan hanya dibuat jika empat GitHub Actions Secrets signing telah diatur.
+- APK release bertanda tangan hanya dibuat jika tiga GitHub Actions Secrets signing telah diatur.
 - Tag versi seperti `v1.0.1` memublikasikan APK release ke halaman GitHub Releases apabila build release bertanda tangan berhasil.
 - Jangan pernah commit keystore atau kata sandinya ke repository.
 
@@ -35,8 +35,9 @@ Di repo SATUOS, buka **Settings → Secrets and variables → Actions → New re
 
 - `SATUOS_KEYSTORE_BASE64`: hasil Base64 dari berkas `.jks`.
 - `SATUOS_KEYSTORE_PASSWORD`: kata sandi keystore.
-- `SATUOS_KEY_ALIAS`: alias, misalnya `satuos`.
 - `SATUOS_KEY_PASSWORD`: kata sandi key.
+
+Workflow membaca alias key langsung dari keystore menggunakan `keytool`, sehingga nilai alias lama tidak lagi dipakai. Pastikan kata sandi key cocok dengan alias pertama yang ada di keystore.
 
 Jangan kirim nilai secret ke chat, issue, log, atau source code.
 

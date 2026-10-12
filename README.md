@@ -53,7 +53,7 @@ npx expo start
 
 Workflow [`.github/workflows/android-apk.yml`](.github/workflows/android-apk.yml) berjalan pada push ke `main`, tag `v*`, atau manual melalui GitHub Actions. Workflow memeriksa TypeScript, tes otomatis, kompatibilitas dependency Expo, lalu membuat APK debug dan mengunggahnya sebagai artifact.
 
-APK **release bertanda tangan** hanya dibuat jika empat repository secrets signing telah dikonfigurasi: `SATUOS_KEYSTORE_BASE64`, `SATUOS_KEYSTORE_PASSWORD`, `SATUOS_KEY_ALIAS`, dan `SATUOS_KEY_PASSWORD`. Setelah secrets tersedia, tag versi seperti `v1.0.1` akan memublikasikan `app-release.apk` di [GitHub Releases](https://github.com/jambudio336-hue/SATUOS/releases). Panduan lengkap tersedia di [`docs/RELEASE-APK.md`](docs/RELEASE-APK.md).
+APK **release bertanda tangan** hanya dibuat jika tiga repository secrets signing telah dikonfigurasi: `SATUOS_KEYSTORE_BASE64`, `SATUOS_KEYSTORE_PASSWORD`, dan `SATUOS_KEY_PASSWORD`. Workflow menemukan alias key langsung dari keystore, jadi secret alias lama tidak digunakan. Setelah secrets valid, tag versi seperti `v1.0.1` akan memublikasikan `app-release.apk` di [GitHub Releases](https://github.com/jambudio336-hue/SATUOS/releases). Panduan lengkap tersedia di [`docs/RELEASE-APK.md`](docs/RELEASE-APK.md).
 
 ## Batasan yang diketahui
 

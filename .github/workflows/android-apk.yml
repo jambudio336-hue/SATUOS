@@ -41,10 +41,9 @@ jobs:
         env:
           SATUOS_KEYSTORE_BASE64: ${{ secrets.SATUOS_KEYSTORE_BASE64 }}
           SATUOS_KEYSTORE_PASSWORD: ${{ secrets.SATUOS_KEYSTORE_PASSWORD }}
-          SATUOS_KEY_ALIAS: ${{ secrets.SATUOS_KEY_ALIAS }}
           SATUOS_KEY_PASSWORD: ${{ secrets.SATUOS_KEY_PASSWORD }}
         run: |
-          if [ -n "$SATUOS_KEYSTORE_BASE64" ] && [ -n "$SATUOS_KEYSTORE_PASSWORD" ] && [ -n "$SATUOS_KEY_ALIAS" ] && [ -n "$SATUOS_KEY_PASSWORD" ]; then
+          if [ -n "$SATUOS_KEYSTORE_BASE64" ] && [ -n "$SATUOS_KEYSTORE_PASSWORD" ] && [ -n "$SATUOS_KEY_PASSWORD" ]; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           else
             echo "enabled=false" >> "$GITHUB_OUTPUT"
@@ -54,12 +53,14 @@ jobs:
         env:
           SATUOS_KEYSTORE_BASE64: ${{ secrets.SATUOS_KEYSTORE_BASE64 }}
           SATUOS_KEYSTORE_PASSWORD: ${{ secrets.SATUOS_KEYSTORE_PASSWORD }}
-          SATUOS_KEY_ALIAS: ${{ secrets.SATUOS_KEY_ALIAS }}
           SATUOS_KEY_PASSWORD: ${{ secrets.SATUOS_KEY_PASSWORD }}
         run: |
           echo "$SATUOS_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/satuos-release.keystore"
+          KEY_ALIAS="$(keytool -list -v -keystore "$RUNNER_TEMP/satuos-release.keystore" -storepass "$SATUOS_KEYSTORE_PASSWORD" | awk -F': ' '/Alias name:/{print $2; exit}')"
+          test -n "$KEY_ALIAS"
+          echo "Signing dengan alias yang ditemukan di keystore: $KEY_ALIAS"
           cd android
-          ./gradlew assembleRelease -Pandroid.injected.signing.store.file="$RUNNER_TEMP/satuos-release.keystore" -Pandroid.injected.signing.store.password="$SATUOS_KEYSTORE_PASSWORD" -Pandroid.injected.signing.key.alias="$SATUOS_KEY_ALIAS" -Pandroid.injected.signing.key.password="$SATUOS_KEY_PASSWORD"
+          ./gradlew assembleRelease -Pandroid.injected.signing.store.file="$RUNNER_TEMP/satuos-release.keystore" -Pandroid.injected.signing.store.password="$SATUOS_KEYSTORE_PASSWORD" -Pandroid.injected.signing.key.alias="$KEY_ALIAS" -Pandroid.injected.signing.key.password="$SATUOS_KEY_PASSWORD"
       - name: Upload APK release bertanda tangan
         if: ${{ steps.signing-check.outputs.enabled == 'true' }}
         uses: actions/upload-artifact@v4
