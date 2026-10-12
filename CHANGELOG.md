@@ -1,3 +1,10 @@
+## 1.2.0 — 2026-10-13
+
+- Identitas M4zk1pL4y.Dev ditampilkan pada dashboard dan seluruh modul, dengan versi Android dinaikkan ke versionCode 3.
+- Penyegaran aksen premium bernuansa emas, animasi tekan/ripple pada kartu dan tombol utama, serta navigasi bawah yang lebih responsif.
+- Catatan keluarga dapat dihapus per item setelah konfirmasi; transaksi tetap mendukung penghapusan.
+- Status koneksi platform sosial tetap dinyatakan apa adanya: layanan dapat dibuka dan konten dibagikan, tetapi OAuth/sinkronisasi akun belum dikonfigurasi.
+
 # Changelog SATUOS
 
 Perubahan penting dicatat di sini.

@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "SATUOS",
+    "name": "SATUOS | M4zk1pL4y.Dev",
     "slug": "satuos",
     "scheme": "satuos",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "icon": "./assets/images/icon.png",
     "orientation": "default",
     "userInterfaceStyle": "dark",
@@ -31,7 +31,7 @@
     ],
     "android": {
       "package": "id.mazkiplay.satuos",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
