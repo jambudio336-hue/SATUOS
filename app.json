@@ -4,6 +4,12 @@
     "slug": "satuos",
     "scheme": "satuos",
     "version": "1.0.0",
+    "icon": "./assets/images/icon.png",
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#070B16"
+    },
     "orientation": "default",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
@@ -20,6 +26,12 @@
     "android": {
       "package": "id.mazkiplay.satuos",
       "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png",
+        "backgroundColor": "#070B16"
+      },
       "permissions": [
         "INTERNET",
         "ACCESS_NETWORK_STATE"

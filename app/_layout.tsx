@@ -2,6 +2,8 @@ import { Stack, ErrorBoundaryProps } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import FirstLaunchIntro, { shouldShowFirstLaunchIntro } from '../components/FirstLaunchIntro';
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   return (
@@ -23,6 +25,19 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 }
 
 export default function Layout() {
+  const [checkingIntro, setCheckingIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(false);
+
+  useEffect(() => {
+    shouldShowFirstLaunchIntro().then((show) => {
+      setShowIntro(show);
+      setCheckingIntro(false);
+    });
+  }, []);
+
+  if (checkingIntro) return <View style={styles.loading} />;
+  if (showIntro) return <FirstLaunchIntro onFinished={() => setShowIntro(false)} />;
+
   // Database initialization is intentionally lazy. Running migrations here and
   // again from a screen could race on cold start.
   return (
@@ -34,6 +49,7 @@ export default function Layout() {
 }
 
 const styles = StyleSheet.create({
+  loading: { flex: 1, backgroundColor: '#070B16' },
   errorPage: { flex: 1, justifyContent: 'center', padding: 24, backgroundColor: '#0B1220' },
   brand: { color: '#FF9F0A', fontSize: 14, fontWeight: '900', letterSpacing: 3, marginBottom: 18 },
   title: { color: '#F8FAFC', fontSize: 25, fontWeight: '900', marginBottom: 10 },
