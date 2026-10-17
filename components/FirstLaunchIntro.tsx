@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   brand: { color: '#F8FAFC', fontSize: 30, fontWeight: '900', letterSpacing: 5, textShadowColor: '#2388E8', textShadowRadius: 14 },
   tagline: { color: '#E1E6EF', fontSize: 13, marginTop: 8 },
   introVoice: { color: '#FFFFFF', fontSize: 12, textAlign: 'center', marginTop: 18, paddingHorizontal: 15 },
-  quoteScreen: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 28 },
+  quoteScreen: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 28 },
   quotePanel: { width: '100%', maxWidth: 460, backgroundColor: 'rgba(7, 15, 32, 0.92)', borderColor: 'rgba(120, 180, 255, 0.45)', borderWidth: 1, borderRadius: 24, padding: 24, alignItems: 'center', marginBottom: 12 },
   quoteEyebrow: { color: '#8CC8FF', fontSize: 10, fontWeight: '900', letterSpacing: 2 },
   quoteMark: { color: '#FFB547', fontSize: 48, lineHeight: 54, fontWeight: '900', marginTop: 8 },
