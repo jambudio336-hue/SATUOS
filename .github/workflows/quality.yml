@@ -21,7 +21,9 @@ jobs:
           cache: npm
       - name: Pasang dependency terkunci
         run: npm ci
-      - name: Periksa dependency Expo
+      - name: Selaraskan dependency Expo dengan SDK terkunci
+        run: npx expo install --fix
+      - name: Verifikasi kompatibilitas dependency Expo
         run: npx expo install --check
       - name: Expo Doctor
         run: npx --yes expo-doctor
