@@ -49,8 +49,8 @@ export default function Layout() {
             const [pin, enabled] = await Promise.all([AsyncStorage.getItem('satuos.pin.v1'), AsyncStorage.getItem('satuos.pin.enabled.v1')]);
             setShowPinLock(!!pin && enabled === 'true');
           } catch {
-            // If the preference cannot be read, never block access to local data.
-            setShowPinLock(false);
+            // Fail closed: if the lock preference cannot be read, show the lock screen instead of bypassing it.
+            setShowPinLock(true);
           }
           setShowIntro(false);
         })();
