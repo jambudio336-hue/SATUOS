@@ -91,13 +91,15 @@ export default function FirstLaunchIntro({ onFinished }: { onFinished: () => voi
             <Text style={styles.introVoice}>Selamat datang di SATUOS. Satu aplikasi, banyak solusi.</Text>
           </>
         ) : (
-          <Pressable accessibilityRole="button" accessibilityLabel="Masuk ke dashboard SATUOS" onPress={onFinished} style={styles.quotePanel}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Masuk ke dashboard SATUOS" onPress={onFinished} style={styles.quoteScreen}>
+            <View style={styles.quotePanel}>
             <Text style={styles.quoteEyebrow}>KATA HARI INI</Text>
             <Text style={styles.quoteMark}>“</Text>
             <Text style={styles.quote}>{dailyQuote()}</Text>
             <Text style={styles.credit}>by.Mazkiplay</Text>
             <View style={styles.continueButton}><Text style={styles.continueText}>Masuk ke SATUOS  →</Text></View>
-            <Text style={styles.tapHint}>Ketuk untuk melanjutkan</Text>
+            <Text style={styles.tapHint}>Ketuk di mana saja untuk melanjutkan</Text>
+            </View>
           </Pressable>
         )}
       </View>
@@ -119,7 +121,8 @@ const styles = StyleSheet.create({
   brand: { color: '#F8FAFC', fontSize: 30, fontWeight: '900', letterSpacing: 5, textShadowColor: '#2388E8', textShadowRadius: 14 },
   tagline: { color: '#E1E6EF', fontSize: 13, marginTop: 8 },
   introVoice: { color: '#FFFFFF', fontSize: 12, textAlign: 'center', marginTop: 18, paddingHorizontal: 15 },
-  quotePanel: { width: '100%', backgroundColor: 'rgba(7, 15, 32, 0.92)', borderColor: 'rgba(120, 180, 255, 0.45)', borderWidth: 1, borderRadius: 24, padding: 24, alignItems: 'center', marginBottom: 12 },
+  quoteScreen: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 28 },
+  quotePanel: { width: '100%', maxWidth: 460, backgroundColor: 'rgba(7, 15, 32, 0.92)', borderColor: 'rgba(120, 180, 255, 0.45)', borderWidth: 1, borderRadius: 24, padding: 24, alignItems: 'center', marginBottom: 12 },
   quoteEyebrow: { color: '#8CC8FF', fontSize: 10, fontWeight: '900', letterSpacing: 2 },
   quoteMark: { color: '#FFB547', fontSize: 48, lineHeight: 54, fontWeight: '900', marginTop: 8 },
   quote: { color: '#FFFFFF', fontSize: 19, lineHeight: 29, textAlign: 'center', fontWeight: '700' },
