@@ -7,6 +7,8 @@ import { listTransactions, summary, Transaction } from '../lib/database';
 import { rupiah } from '../lib/format';
 import BottomNav from '../components/BottomNav';
 
+const financeQuotes = ['Uang bukan tentang seberapa banyak yang datang, tetapi seberapa bijak kamu menjaganya.','Jangan biarkan pengeluaran hari ini mencuri ketenangan masa depanmu.','Sedikit yang disisihkan dengan konsisten bisa menjadi harapan besar.','Setiap rupiah punya tujuan. Belanjakan dengan sadar, simpan dengan sabar.','Pemasukan memberimu peluang; pengelolaan yang baik memberimu ketenangan.','Keuangan yang sehat dimulai dari keberanian jujur pada setiap catatan.','Masa depan dibangun dari keputusan kecil yang kamu ambil hari ini.','Sebelum uang habis tanpa arah, beri setiap rupiah alasan untuk pergi.','Anggaran bukan batas kebebasan; anggaran adalah peta menuju tujuanmu.','Jangan biarkan gengsi mengatur dompetmu. Biarkan tujuan yang memandumu.'];
+function dailyFinanceQuote() { const now = new Date(); const day = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000); return financeQuotes[(day + now.getFullYear()) % financeQuotes.length]; }
 type Module = { title: string; desc: string; route: Href; icon: string; color: string; category: string };
 const modules: Module[] = [
   { title: 'SATU Money', desc: 'Transaksi, anggaran, dan dompet', route: '/money', icon: 'Rp', color: '#2388E8', category: 'Keuangan' },
@@ -84,6 +86,7 @@ export default function Home() {
 
         {dbError && <View style={s.errorCard}><Text style={s.errorTitle}>Data belum bisa dimuat</Text><Text style={s.errorText}>{dbError}</Text><Pressable accessibilityRole="button" onPress={() => void load()}><Text style={s.errorLink}>Coba lagi</Text></Pressable></View>}
 
+        <View style={s.quoteCard}><Text style={s.quoteEyebrow}>✦ INSPIRASI KEUANGAN HARI INI</Text><Text style={s.quoteText}>“{dailyFinanceQuote()}”</Text><Text style={s.quoteCredit}>by.Mazkiplay</Text></View>
         <View style={s.sectionHeader}><View><Text style={s.sectionTitle}>Aksi cepat</Text><Text style={s.sectionSub}>Fitur yang sering digunakan</Text></View></View>
         <View style={s.quickRow}>
           <Pressable accessibilityRole="button" style={({ pressed }) => [s.quickCard, pressed && s.pressed]} onPress={() => router.push('/money')}><View style={[s.quickIcon, { backgroundColor: '#E7F2FF' }]}><Text style={{ color: '#1976D2' }}>＋</Text></View><Text style={s.quickTitle}>Catat uang</Text><Text style={s.quickSub}>Pemasukan & biaya</Text></Pressable>
@@ -143,6 +146,10 @@ const s = StyleSheet.create({
   income: { color: '#14966D', fontSize: 13, fontWeight: '900', marginTop: 5 },
   expense: { color: '#D84B56', fontSize: 13, fontWeight: '900', marginTop: 5 },
   metricDivider: { width: 1, height: 31, backgroundColor: '#E3E9F1', marginHorizontal: 13 },
+  quoteCard: { marginHorizontal: 20, marginTop: 20, padding: 17, borderRadius: 18, backgroundColor: '#E7F3FF', borderColor: '#C7E3FF', borderWidth: 1 },
+  quoteEyebrow: { color: '#2675B8', fontSize: 9, fontWeight: '900', letterSpacing: 0.8 },
+  quoteText: { color: '#1D3C5A', fontSize: 15, lineHeight: 23, fontWeight: '700', marginTop: 9 },
+  quoteCredit: { color: '#397EB6', fontSize: 10, fontWeight: '800', textAlign: 'right', marginTop: 11 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 20, marginTop: 23, marginBottom: 12 },
   sectionTitle: { color: '#19334F', fontSize: 17, fontWeight: '900' },
   sectionSub: { color: '#8290A2', fontSize: 11, marginTop: 3 },
