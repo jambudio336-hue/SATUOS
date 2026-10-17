@@ -47,6 +47,16 @@ function dailyQuote() {
   return quotes[(day + now.getFullYear()) % quotes.length];
 }
 
+function pauseSafely(player: { pause: () => void } | null | undefined) {
+  // Native players can be released by Expo during navigation/unmount.
+  // Never let a late pause call crash the app or block dashboard navigation.
+  try {
+    player?.pause();
+  } catch {
+    // Player is already released; cleanup is intentionally best-effort.
+  }
+}
+
 export default function FirstLaunchIntro({ onFinished }: { onFinished: () => void }) {
   const finishedRef = useRef(false);
   const [showQuote, setShowQuote] = useState(false);
@@ -60,8 +70,8 @@ export default function FirstLaunchIntro({ onFinished }: { onFinished: () => voi
   const finishVideo = useCallback(() => {
     if (finishedRef.current) return;
     finishedRef.current = true;
-    audioPlayer.pause();
-    videoPlayer.pause();
+    pauseSafely(audioPlayer);
+    pauseSafely(videoPlayer);
     setShowQuote(true);
   }, [audioPlayer, videoPlayer]);
 
@@ -74,8 +84,8 @@ export default function FirstLaunchIntro({ onFinished }: { onFinished: () => voi
     return () => {
       active = false;
       clearTimeout(timeout);
-      audioPlayer.pause();
-      videoPlayer.pause();
+      pauseSafely(audioPlayer);
+      pauseSafely(videoPlayer);
     };
   }, [audioPlayer, videoPlayer, finishVideo]);
 
