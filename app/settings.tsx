@@ -91,6 +91,15 @@ export default function Settings() {
         </View>
 
         <View style={s.card}>
+          <Text style={s.cardTitle}>Dukung Pengembangan SATUOS</Text>
+          <Text style={s.muted}>Jika SATUOS membantu aktivitas Anda dan Anda menyukai aplikasi ini, Anda dapat mendukung pengembang melalui donasi atau saweria. Dukungan Anda membantu biaya pengembangan, perbaikan bug, peningkatan keamanan, dan pengalaman pengguna agar SATUOS terus berkembang. Donasi bersifat sukarela dan tidak wajib.</Text>
+          <View style={s.notice}><Text style={s.noticeText}>Pembayaran donasi belum terhubung otomatis di aplikasi ini. Pastikan menggunakan kanal donasi resmi milik by.Mazkiplay dan periksa nama penerima sebelum membayar.</Text></View>
+          <Pressable style={s.whatsapp} onPress={() => Linking.openURL('https://wa.me/6285262965282?text=Saya%20ingin%20mendukung%20pengembangan%20SATUOS%20melalui%20donasi%20atau%20saweria')}><Text style={s.whatsappText}>♡  Tanya kanal donasi resmi</Text></Pressable>
+          <Text style={s.credit}>Terima kasih telah mendukung SATUOS.</Text>
+          <Text style={s.credit}>by.Mazkiplay</Text>
+        </View>
+
+        <View style={s.card}>
           <Text style={s.cardTitle}>Penyimpanan data</Text>
           <Text style={s.muted}>Catatan transaksi, usaha, dan riwayat aplikasi disimpan dalam database lokal SQLite di perangkat. Menghapus aplikasi atau data aplikasi dapat menghapus data lokal jika belum dicadangkan.</Text>
         </View>
