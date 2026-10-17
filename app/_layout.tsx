@@ -1,9 +1,11 @@
 import { ErrorBoundaryProps, Stack } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import FirstLaunchIntro, { shouldShowFirstLaunchIntro } from '../components/FirstLaunchIntro';
+import AppPinLock from '../components/AppPinLock';
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   return (
@@ -23,6 +25,7 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 export default function Layout() {
   const [checkingIntro, setCheckingIntro] = useState(true);
   const [showIntro, setShowIntro] = useState(false);
+  const [showPinLock, setShowPinLock] = useState(false);
   useEffect(() => {
     let mounted = true;
     void shouldShowFirstLaunchIntro().then((show) => {
@@ -40,7 +43,18 @@ export default function Layout() {
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
-      {checkingIntro ? <View style={styles.loading} /> : showIntro ? <FirstLaunchIntro onFinished={() => setShowIntro(false)} /> : (
+      {checkingIntro ? <View style={styles.loading} /> : showIntro ? <FirstLaunchIntro onFinished={() => {
+        void (async () => {
+          try {
+            const [pin, enabled] = await Promise.all([AsyncStorage.getItem('satuos.pin.v1'), AsyncStorage.getItem('satuos.pin.enabled.v1')]);
+            setShowPinLock(!!pin && enabled === 'true');
+          } catch {
+            // If the preference cannot be read, never block access to local data.
+            setShowPinLock(false);
+          }
+          setShowIntro(false);
+        })();
+      }} /> : showPinLock ? <AppPinLock onUnlocked={() => setShowPinLock(false)} /> : (
         // Database initialization remains lazy to avoid migration races on cold start.
         <Stack screenOptions={{
           headerShown: false,
