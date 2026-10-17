@@ -3,7 +3,7 @@
     "name": "SATUOS | M4zk1pL4y.Dev",
     "slug": "satuos",
     "scheme": "satuos",
-    "version": "1.2.1",
+    "version": "1.2.3",
     "icon": "./assets/images/icon.png",
     "orientation": "default",
     "userInterfaceStyle": "dark",
@@ -32,7 +32,7 @@
     ],
     "android": {
       "package": "id.mazkiplay.satuos",
-      "versionCode": 4,
+      "versionCode": 5,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
