@@ -1,11 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Linking, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Alert, Image, Linking, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 
 const PIN_KEY = 'satuos.pin.v1';
 const ENABLE_KEY = 'satuos.pin.enabled.v1';
+// QRIS payload decoded from the QR supplied by the app owner.
+const DONATION_QRIS = '00020101021226570011ID.DANA.WWW011893600915003414343002090341434300303UMI51440014ID.CO.QRIS.WWW0215ID10265718705950303UMI5204599953033605405599005802ID5924M4zK1pL4Y Nusantara 0x1D6015Kota Jakarta Ti610513440621960150011ID.DANA.WWW63048942';
+const DONATION_QR_IMAGE = 'https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=12&data=' + encodeURIComponent(DONATION_QRIS);
 
 export default function Settings() {
   const router = useRouter();
@@ -100,6 +103,17 @@ export default function Settings() {
         </View>
 
         <View style={s.card}>
+          <Text style={s.cardTitle}>Dukung Pengembangan SATUOS</Text>
+          <Text style={s.muted}>Jika Anda menyukai SATUOS, Anda dapat memberikan donasi atau saweria secara sukarela. Dukungan Anda membantu pengembangan fitur, perbaikan bug, dan peningkatan pengalaman pengguna agar SATUOS terus berkembang. Donasi tidak wajib.</Text>
+          <View style={s.qrWrap}>
+            <Image source={{ uri: DONATION_QR_IMAGE }} style={s.qrImage} resizeMode="contain" accessibilityLabel="QRIS donasi SATUOS" />
+          </View>
+          <Text style={s.qrCaption}>Pindai QRIS melalui aplikasi pembayaran yang mendukung QRIS.</Text>
+          <Text style={s.credit}>by.Mazkiplay</Text>
+          <Text style={s.qrFootnote}>QR ditampilkan dari layanan pembuat gambar QR online; koneksi internet diperlukan untuk memuat gambar.</Text>
+        </View>
+
+        <View style={s.card}>
           <Text style={s.cardTitle}>Penyimpanan data</Text>
           <Text style={s.muted}>Catatan transaksi, usaha, dan riwayat aplikasi disimpan dalam database lokal SQLite di perangkat. Menghapus aplikasi atau data aplikasi dapat menghapus data lokal jika belum dicadangkan.</Text>
         </View>
@@ -136,4 +150,8 @@ const s = StyleSheet.create({
   whatsapp: { padding: 13, borderRadius: 12, backgroundColor: '#E6F7EC', alignItems: 'center', marginTop: 5 },
   whatsappText: { color: '#147A47', fontSize: 12, fontWeight: '900' },
   credit: { color: '#8192A6', fontSize: 10, textAlign: 'center' },
+  qrWrap: { alignSelf: 'center', width: 260, maxWidth: '100%', aspectRatio: 1, backgroundColor: '#FFFFFF', borderRadius: 14, padding: 8, borderWidth: 1, borderColor: '#E1EAF4' },
+  qrImage: { width: '100%', height: '100%' },
+  qrCaption: { color: '#2B4259', fontSize: 12, fontWeight: '700', textAlign: 'center' },
+  qrFootnote: { color: '#8192A6', fontSize: 10, lineHeight: 15, textAlign: 'center' },
 });
