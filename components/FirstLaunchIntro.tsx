@@ -88,7 +88,7 @@ export default function FirstLaunchIntro({ onFinished }: { onFinished: () => voi
             <View style={styles.soundPill}><View style={styles.soundDot} /><Text style={styles.soundText}>SELAMAT DATANG</Text></View>
             <Text style={styles.brand}>SATUOS</Text>
             <Text style={styles.tagline}>Satu Aplikasi, Banyak Solusi.</Text>
-            <Text style={styles.introVoice}>Selamat datang di SATUOS. Satu aplikasi, banyak solusi.</Text>
+            <Text style={styles.introVoice}>Selamat datang di SATUOS. Satu masalah untuk semua.</Text>
           </>
         ) : (
           <Pressable accessibilityRole="button" accessibilityLabel="Masuk ke dashboard SATUOS" onPress={onFinished} style={styles.quoteScreen}>
